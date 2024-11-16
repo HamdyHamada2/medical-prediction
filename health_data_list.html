@@ -1,0 +1,32 @@
+<!-- health_data_list.html -->
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Data List</title>
+</head>
+<body>
+    <h1>البيانات الطبية</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>الاسم</th>
+                <th>العمر</th>
+                <th>التشخيص</th>
+                <!-- أضف المزيد من الأعمدة هنا حسب البيانات التي لديك -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.age }}</td>
+                <td>{{ item.diagnosis }}</td>
+                <!-- أضف المزيد من الحقول هنا حسب البيانات -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
