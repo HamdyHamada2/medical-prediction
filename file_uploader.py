@@ -223,7 +223,7 @@ import os
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ValidationError
-from myapp.models import HealthData, AiModels, Diagnosiss, Diseases
+from health.models import HealthData, AiModels, Diagnosiss, Diseases
 
 UPLOAD_FOLDER = r'C:\Baymax\UPFile'
 
@@ -290,6 +290,14 @@ class Command (BaseCommand):
             'al': 'al'
         }
         self.upload_to_model (df, HealthData, fields_mapping)
+
+    def upload_to_ai_models(self, df):
+        fields_mapping = {
+            'model_name': 'model_name',
+            'accuracy': 'accuracy',
+            'parameters': 'parameters',
+        }
+        self.upload_to_model (df, AiModels, fields_mapping)
 
     def upload_to_model(self, df, model_class, fields_mapping):
         for index, row in df.iterrows ():
