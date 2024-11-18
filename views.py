@@ -1223,6 +1223,7 @@
 #     return render(request, 'upload.html')  # أو صفحة أخرى
 
 from django.db import models
+from .models import AiModels
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
@@ -1244,34 +1245,34 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        user = authenticate (request, username=username, password=password)
 
         if user is not None:
-            login(request, user)
-            return redirect('home')  # إعادة توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
+            login (request, user)
+            return redirect ('home')  # إعادة توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
         else:
-            return render(request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+            return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
 
-    return render(request, 'home.html')  # إذا كانت الطلبات من نوع GET، سيتم عرض صفحة تسجيل الدخول
+    return render (request, 'home.html')  # إذا كانت الطلبات من نوع GET، سيتم عرض صفحة تسجيل الدخول
 
 
 # دالة لعرض الصفحة الرئيسية
 def home_view(request):
-    return render(request, 'home.html')
+    return render (request, 'home.html')
 
 
 # API لعرض بيانات الصحة
-class HealthDataListCreateView(APIView):
-    queryset = HealthData.objects.all()
+class HealthDataListCreateView (APIView):
+    queryset = HealthData.objects.all ()
     serializer_class = HealthDataSerializer
 
 
 # API للتنبؤ بالحالة الصحية
-class HealthPredictionAPIView(APIView):
+class HealthPredictionAPIView (APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         prediction_result = {"message": "Prediction logic not implemented yet"}
-        return Response(prediction_result, status=status.HTTP_200_OK)
+        return Response (prediction_result, status=status.HTTP_200_OK)
 
 
 # دالة لرفع الملفات
@@ -1280,133 +1281,120 @@ def upload_files_view(request):
     file_url = None
 
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
+        form = UploadFileForm (request.POST, request.FILES)
+        if form.is_valid ():
             file = request.FILES['file']
             try:
                 # حفظ الملف في المسار المحدد
-                fs = FileSystemStorage()
-                file_name = fs.save(file.name, file)
-                file_url = fs.url(file_name)
+                fs = FileSystemStorage ()
+                file_name = fs.save (file.name, file)
+                file_url = fs.url (file_name)
 
                 message = f"تم رفع الملف بنجاح: {file.name}"
 
                 # معالجة البيانات من الملف
-                file_path = os.path.join(settings.UPLOAD_FOLDER, file.name)
-                df = pd.read_csv(file_path) if file.name.endswith('.csv') else pd.read_excel(file_path)
+                file_path = os.path.join (settings.UPLOAD_FOLDER, file.name)
+                df = pd.read_csv (file_path) if file.name.endswith ('.csv') else pd.read_excel (file_path)
 
                 # يمكن هنا استدعاء الدالة التي تتعامل مع البيانات مثل upload_to_health_data
 
             except Exception as e:
-                message = f"حدث خطأ أثناء رفع الملف: {str(e)}"
+                message = f"حدث خطأ أثناء رفع الملف: {str (e)}"
         else:
             message = 'الملف غير صالح أو هناك مشكلة في النموذج.'
     else:
-        form = UploadFileForm()
+        form = UploadFileForm ()
 
-    return render(request, 'upload_file.html', {'form': form, 'message': message, 'file_url': file_url})
-
-
-# نموذج AIModels
-class AiModels(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)  # لتخزين تاريخ ووقت الإنشاء
-    updated_at = models.DateTimeField(auto_now=True)  # لتخزين تاريخ ووقت التحديث
-    is_active = models.BooleanField(default=True)  # لتحديد ما إذا كان النموذج نشطًا أم لا
-
-    def __str__(self):
-        return self.name
+    return render (request, 'upload_file.html', {'form': form, 'message': message, 'file_url': file_url})
 
 
 # API لعرض AiModels
-class AiModelsList(APIView):
+class AiModelsList (APIView):
     def get(self, request):
-        ai_models = AiModels.objects.all()
-        serializer = AiModelsSerializer(ai_models, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        ai_models = AiModels.objects.all ()
+        serializer = AiModelsSerializer (ai_models, many=True)
+        return Response (serializer.data, status=status.HTTP_200_OK)
 
 
 # دالة لإدارة نموذج AIModels
-class AIModelsListCreateView(APIView):
-    queryset = AIModels.objects.all()
-    serializer_class = AIModelsSerializer
+class AIModelsListCreateView (APIView):
+    AiModels.objects.all ()
+    serializer_class = AiModelsSerializer
 
 
 # API لعرض بيانات HealthData
 def get_health_data(request):
     if request.method == 'GET':
-        data = list(HealthData.objects.values())
-        return JsonResponse({'status': 'success', 'data': data}, safe=False)
-    return JsonResponse({'status': 'error', 'message': 'Invalid HTTP method'}, status=400)
+        data = list (HealthData.objects.values ())
+        return JsonResponse ({'status': 'success', 'data': data}, safe=False)
+    return JsonResponse ({'status': 'error', 'message': 'Invalid HTTP method'}, status=400)
 
 
 # تسجيل مستخدم جديد عبر API
-class RegisterView(APIView):
+class RegisterView (APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        email = request.data.get("email")
-        fname = request.data.get("Fname")
-        lname = request.data.get("Lname")
+        username = request.data.get ("username")
+        password = request.data.get ("password")
+        email = request.data.get ("email")
+        fname = request.data.get ("Fname")
+        lname = request.data.get ("Lname")
 
         if not username or not password or not email or not fname or not lname:
-            return Response({
+            return Response ({
                 "status": "error",
                 "message": "All fields are required."
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
-                return Response({
+            if User.objects.filter (username=username).exists () or User.objects.filter (email=email).exists ():
+                return Response ({
                     "status": "error",
                     "message": "Username or email already exists."
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            user = User.objects.create_user(username=username, password=password, email=email)
+            user = User.objects.create_user (username=username, password=password, email=email)
             user.first_name = fname
             user.last_name = lname
-            user.save()
+            user.save ()
 
-            return Response({
+            return Response ({
                 "status": "success",
                 "message": "User registered successfully."
             }, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({
+            return Response ({
                 "status": "error",
-                "message": str(e)
+                "message": str (e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # دالة لتسجيل الدخول عبر API
-class LoginView(APIView):
+class LoginView (APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        username = request.data.get ('username')
+        password = request.data.get ('password')
 
         if not username or not password:
-            return Response({
+            return Response ({
                 "status": "error",
                 "message": "Both username and password are required."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate (request, username=username, password=password)
 
         if user is not None:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({
+            token, created = Token.objects.get_or_create (user=user)
+            return Response ({
                 "status": "success",
                 "message": "Login successful",
                 "token": token.key
             }, status=status.HTTP_200_OK)
         else:
-            return Response({
+            return Response ({
                 "status": "error",
                 "message": "Invalid credentials."
             }, status=status.HTTP_400_BAD_REQUEST)
-
