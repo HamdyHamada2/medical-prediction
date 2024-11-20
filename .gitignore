@@ -1,0 +1,21 @@
+# ملفات بيئة .env (للتأكد من عدم رفعها)
+.env
+
+# ملفات Python مبدئية
+__pycache__/
+*.py[cod]
+
+# ملفات Django
+db.sqlite3
+/static/
+/media/
+
+# ملفات إعدادات IDE
+.vscode/
+.idea/
+
+# ملفات بيئية أخرى
+*.log
+*.pot
+*.pyc
+.env.*
