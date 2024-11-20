@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        p {
+            font-size: 18px;
+        }
+        a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        a:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>مرحباً بك في الصفحة الرئيسية!</h1>
+    <p>هذا هو مشروع التنبؤ بالحالات الصحية.</p>
+
+    {% if user.is_authenticated %}
+        <p>مرحباً، {{ user.first_name }} {{ user.last_name }}!</p>
+        <a href="{% url 'logout' %}">تسجيل الخروج</a>
+    {% else %}
+        <p>يرجى تسجيل الدخول لعرض المحتوى.</p>
+        <a href="{% url 'login' %}">تسجيل الدخول</a> <!-- إضافة رابط تسجيل الدخول -->
+    {% endif %}
+</body>
+</html>

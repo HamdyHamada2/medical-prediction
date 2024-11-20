@@ -1,0 +1,68 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+<div class="object-tools">
+    <!-- الرسالة التحذيرية للمستخدم -->
+    <p class="info-message">الرجاء رفع ملف CSV الذي يحتوي على البيانات المطلوبة.</p>
+
+    <!-- الرابط القديم مع تحسينات CSS لفصل الأزرار -->
+    <a href="{% url 'admin:upload_csv' %}" class="addlink">رفع ملف CSV</a>
+
+    &nbsp; <!-- فاصل بين الأزرار -->
+
+    <!-- الرابط الجديد الذي يحتوي على class 'button' مع إضافة تحسينات CSS -->
+    <a href="{% url 'admin:upload_csv' %}" class="button">رفع ملف CSV</a>
+
+    <!-- مثال لأداة تحميل Spinner -->
+    <div class="spinner" style="display:none;">
+        <div class="loading">جاري تحميل الملف...</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+    <style>
+        /* تحسينات CSS للأزرار */
+        .addlink, .button {
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .addlink {
+            background-color: #4CAF50; /* اللون الأخضر */
+        }
+
+        .button {
+            background-color: #008CBA; /* لون زر مختلف */
+        }
+
+        .addlink:hover, .button:hover {
+            background-color: #45a049; /* تغيير اللون عند التمرير */
+        }
+
+        /* تحسينات CSS لرسالة التحذير */
+        .info-message {
+            font-size: 14px;
+            color: #f44336;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* تحسينات CSS لأداة التحميل */
+        .spinner {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .loading {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+{% endblock %}
