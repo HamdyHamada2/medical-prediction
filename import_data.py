@@ -164,10 +164,12 @@ import django
 import os
 
 # إضافة المسار للمشروع
-sys.path.append(r'C:\Baymax')
+sys.path.append(r"C:\Baymax")
 
 # التأكد من إعداد Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Baymax.settings")  # قم بتغيير 'Baymax.settings' إلى اسم ملف الإعدادات إذا كان مختلفًا
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "Baymax.settings"
+)  # قم بتغيير 'Baymax.settings' إلى اسم ملف الإعدادات إذا كان مختلفًا
 django.setup()
 
 from health.models import HealthData  # تأكد من استيراد النموذج بشكل صحيح
@@ -176,7 +178,7 @@ from health.models import HealthData  # تأكد من استيراد النمو�
 # دالة لتنظيف القيم غير الصالحة
 def clean_range_value(value):
     """تنظيف القيم غير الصالحة وتحويلها إلى قيمة صالحة أو None"""
-    if value == 'discrete' or value == 'None' or value == 'NaN':
+    if value == "discrete" or value == "None" or value == "NaN":
         return None  # تجاهل القيم غير الصالحة
     try:
         return float(value)  # حاول تحويل القيمة إلى رقم عشري
@@ -189,12 +191,12 @@ def clean_range_value(value):
 def clean_age(value):
     """تنظيف البيانات الخاصة بعمر المريض"""
     if isinstance(value, str):
-        if '<' in value:
+        if "<" in value:
             return None  # تجاهل القيم مثل "< 12"
-        elif '-' in value:
+        elif "-" in value:
             # استخراج العمر من النطاق
             try:
-                start_age, end_age = value.split(' - ')
+                start_age, end_age = value.split(" - ")
                 return int(start_age)  # اختيار العمر الأصغر أو المتوسط
             except ValueError:
                 return None
@@ -216,49 +218,53 @@ def read_file(file_path):
 
     for index, row in data.iterrows():
         # تنظيف القيم غير الصالحة في الأعمدة الأخرى
-        age_value = clean_age(row['age'])
+        age_value = clean_age(row["age"])
         if age_value is None:
             print(f"القيمة غير صالحة للـ age في السطر {index}. يتم تخطي السطر.")
             continue  # تخطي السطر إذا كانت القيمة غير صالحة
 
         # معالجة القيم غير الصالحة في 'sex'
-        if pd.isnull(row['sex']) or row['sex'] not in ['m', 'f']:
-            print(f"القيمة غير صالحة للـ sex في السطر {index}. يتم تعيين القيمة الافتراضية.")
-            row['sex'] = 'f'  # تعيين القيمة الافتراضية للـ sex إذا كانت فارغة أو غير صالحة
+        if pd.isnull(row["sex"]) or row["sex"] not in ["m", "f"]:
+            print(
+                f"القيمة غير صالحة للـ sex في السطر {index}. يتم تعيين القيمة الافتراضية."
+            )
+            row["sex"] = (
+                "f"  # تعيين القيمة الافتراضية للـ sex إذا كانت فارغة أو غير صالحة
+            )
 
         # إضافة باقي الأعمدة مع التحقق من القيم غير الصالحة
         health_data_objects.append(
             HealthData(
-                bp_diastolic=clean_range_value(row.get('bp (Diastolic)', None)),
-                bp_limit=row.get('bp limit', None),
-                sg=row.get('sg', None),
-                al=row.get('al', None),
-                class_field=row.get('class', None),
-                rbc=row.get('rbc', None),
-                su=row.get('su', None),
-                pc=row.get('pc', None),
-                pcc=row.get('pcc', None),
-                ba=row.get('ba', None),
-                bgr=row.get('bgr', None),
-                bu=row.get('bu', None),
-                sod=row.get('sod', None),
-                sc=row.get('sc', None),
-                pot=row.get('pot', None),
-                hemo=row.get('hemo', None),
-                pcv=row.get('pcv', None),
-                rbcc=row.get('rbcc', None),
-                wbcc=row.get('wbcc', None),
-                htn=row.get('htn', None),
-                dm=row.get('dm', None),
-                cad=row.get('cad', None),
-                appet=row.get('appet', None),
-                pe=row.get('pe', None),
-                ane=row.get('ane', None),
-                grf=row.get('grf', None),
-                stage=row.get('stage', None),
-                affected=row.get('affected', None),
+                bp_diastolic=clean_range_value(row.get("bp (Diastolic)", None)),
+                bp_limit=row.get("bp limit", None),
+                sg=row.get("sg", None),
+                al=row.get("al", None),
+                class_field=row.get("class", None),
+                rbc=row.get("rbc", None),
+                su=row.get("su", None),
+                pc=row.get("pc", None),
+                pcc=row.get("pcc", None),
+                ba=row.get("ba", None),
+                bgr=row.get("bgr", None),
+                bu=row.get("bu", None),
+                sod=row.get("sod", None),
+                sc=row.get("sc", None),
+                pot=row.get("pot", None),
+                hemo=row.get("hemo", None),
+                pcv=row.get("pcv", None),
+                rbcc=row.get("rbcc", None),
+                wbcc=row.get("wbcc", None),
+                htn=row.get("htn", None),
+                dm=row.get("dm", None),
+                cad=row.get("cad", None),
+                appet=row.get("appet", None),
+                pe=row.get("pe", None),
+                ane=row.get("ane", None),
+                grf=row.get("grf", None),
+                stage=row.get("stage", None),
+                affected=row.get("affected", None),
                 age=age_value,  # القيمة التي تم التحقق منها
-                sex=row['sex'],  # القيمة التي تم التحقق منها
+                sex=row["sex"],  # القيمة التي تم التحقق منها
             )
         )
 
@@ -271,7 +277,7 @@ def read_file(file_path):
 
 
 # تحديد مسار ملف CSV
-file_path = 'C:\\Baymax\\UPFile\\ckd-dataset-v2.csv'  # تأكد من المسار الصحيح للملف
+file_path = "C:\\Baymax\\UPFile\\ckd-dataset-v2.csv"  # تأكد من المسار الصحيح للملف
 
 # استدعاء الدالة لقراءة البيانات
 read_file(file_path)

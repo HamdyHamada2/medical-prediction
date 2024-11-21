@@ -225,89 +225,96 @@ from django.core.management.base import BaseCommand
 from django.core.exceptions import ValidationError
 from health.models import HealthData, AiModels, Diagnosiss, Diseases
 
-UPLOAD_FOLDER = r'C:\Baymax\UPFile'
+UPLOAD_FOLDER = r"C:\Baymax\UPFile"
 
 MODEL_MAPPING = {
-    'health': (HealthData, 'upload_to_health_data'),
-    'ai': (AiModels, 'upload_to_ai_models'),
-    'diagnosis': (Diagnosiss, 'upload_to_diagnosiss'),
-    'diseases': (Diseases, 'upload_to_diseases'),
+    "health": (HealthData, "upload_to_health_data"),
+    "ai": (AiModels, "upload_to_ai_models"),
+    "diagnosis": (Diagnosiss, "upload_to_diagnosiss"),
+    "diseases": (Diseases, "upload_to_diseases"),
 }
 
-REQUIRED_COLUMNS = ['bp_diastolic', 'bp_limit', 'sg', 'al']
+REQUIRED_COLUMNS = ["bp_diastolic", "bp_limit", "sg", "al"]
 
 
-class Command (BaseCommand):
-    help = 'Uploads files from a folder and saves them to the database'
+class Command(BaseCommand):
+    help = "Uploads files from a folder and saves them to the database"
 
     def handle(self, *args, **kwargs):
-        self.upload_files_from_folder ()
+        self.upload_files_from_folder()
 
     def upload_files_from_folder(self):
-        files = [f for f in os.listdir (UPLOAD_FOLDER) if f.endswith (('.csv', '.xlsx'))]
+        files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".csv", ".xlsx"))]
         for file_name in files:
-            file_path = os.path.join (UPLOAD_FOLDER, file_name)
-            with open (file_path, 'rb') as file:
+            file_path = os.path.join(UPLOAD_FOLDER, file_name)
+            with open(file_path, "rb") as file:
                 try:
-                    self.process_file (file, file_name)
-                    self.stdout.write (self.style.SUCCESS (f"تم رفع الملف بنجاح: {file_name}"))
+                    self.process_file(file, file_name)
+                    self.stdout.write(
+                        self.style.SUCCESS(f"تم رفع الملف بنجاح: {file_name}")
+                    )
                 except Exception as e:
-                    self.stdout.write (self.style.ERROR (f"حدث خطأ أثناء رفع الملف {file_name}: {str (e)}"))
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"حدث خطأ أثناء رفع الملف {file_name}: {str (e)}"
+                        )
+                    )
 
     def process_file(self, file, file_name):
         try:
-            df = pd.read_csv (file) if file.name.endswith ('.csv') else pd.read_excel (file)
-            self.validate_columns (df)
-            df = self.clean_data (df)
+            df = (
+                pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
+            )
+            self.validate_columns(df)
+            df = self.clean_data(df)
 
-            model_class, upload_function = self.get_model_choice (file_name)
-            upload_function (df)
-            report = self.generate_report (df, file_name, model_class.__name__)
-            self.stdout.write (report)
+            model_class, upload_function = self.get_model_choice(file_name)
+            upload_function(df)
+            report = self.generate_report(df, file_name, model_class.__name__)
+            self.stdout.write(report)
         except Exception as e:
-            raise ValidationError (f"خطأ أثناء معالجة الملف {file_name}: {e}")
+            raise ValidationError(f"خطأ أثناء معالجة الملف {file_name}: {e}")
 
     def validate_columns(self, df):
         missing_columns = [col for col in REQUIRED_COLUMNS if col not in df.columns]
         if missing_columns:
-            raise ValidationError (f"الأعمدة المفقودة: {missing_columns}")
+            raise ValidationError(f"الأعمدة المفقودة: {missing_columns}")
 
     def clean_data(self, df):
-        df.fillna ({
-            'bp_diastolic': 0,
-            'bp_limit': 120,
-            'sg': 1.0,
-            'al': 1.0
-        }, inplace=True)
-        df = df[df['bp_diastolic'] > 0]
+        df.fillna(
+            {"bp_diastolic": 0, "bp_limit": 120, "sg": 1.0, "al": 1.0}, inplace=True
+        )
+        df = df[df["bp_diastolic"] > 0]
         return df
 
     def upload_to_health_data(self, df):
         fields_mapping = {
-            'bp_diastolic': 'bp_diastolic',
-            'bp_limit': 'bp_limit',
-            'sg': 'sg',
-            'al': 'al'
+            "bp_diastolic": "bp_diastolic",
+            "bp_limit": "bp_limit",
+            "sg": "sg",
+            "al": "al",
         }
-        self.upload_to_model (df, HealthData, fields_mapping)
+        self.upload_to_model(df, HealthData, fields_mapping)
 
     def upload_to_ai_models(self, df):
         fields_mapping = {
-            'model_name': 'model_name',
-            'accuracy': 'accuracy',
-            'parameters': 'parameters',
+            "model_name": "model_name",
+            "accuracy": "accuracy",
+            "parameters": "parameters",
         }
-        self.upload_to_model (df, AiModels, fields_mapping)
+        self.upload_to_model(df, AiModels, fields_mapping)
 
     def upload_to_model(self, df, model_class, fields_mapping):
-        for index, row in df.iterrows ():
-            data = {field: row.get (column, None) for column, field in fields_mapping.items ()}
-            model_instance = model_class (**data)
-            model_instance.save ()
+        for index, row in df.iterrows():
+            data = {
+                field: row.get(column, None) for column, field in fields_mapping.items()
+            }
+            model_instance = model_class(**data)
+            model_instance.save()
 
     def generate_report(self, df, file_name, model_name):
-        total_rows = len (df)
-        failed_rows = df.isnull ().sum ().sum ()
+        total_rows = len(df)
+        failed_rows = df.isnull().sum().sum()
         report = (
             f"تم رفع الملف: {file_name} إلى النموذج: {model_name}\n"
             f"عدد الصفوف الكلية: {total_rows}\n"
@@ -316,13 +323,13 @@ class Command (BaseCommand):
         return report
 
     def get_model_choice(self, file_name):
-        if 'health' in file_name:
-            return MODEL_MAPPING['health']
-        elif 'ai' in file_name:
-            return MODEL_MAPPING['ai']
-        elif 'diagnosis' in file_name:
-            return MODEL_MAPPING['diagnosis']
-        elif 'diseases' in file_name:
-            return MODEL_MAPPING['diseases']
+        if "health" in file_name:
+            return MODEL_MAPPING["health"]
+        elif "ai" in file_name:
+            return MODEL_MAPPING["ai"]
+        elif "diagnosis" in file_name:
+            return MODEL_MAPPING["diagnosis"]
+        elif "diseases" in file_name:
+            return MODEL_MAPPING["diseases"]
         else:
-            raise ValueError (f"Unknown file type: {file_name}")
+            raise ValueError(f"Unknown file type: {file_name}")
