@@ -619,30 +619,16 @@
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
-# تحميل المتغيرات من ملف .env
-load_dotenv()
-
-# تحديد إعدادات Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Baymax.settings")
-
-# المسار الأساسي للمشروع
+# **المسار الأساسي للمشروع**
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# تعريف المسار الجذري للمسارات
-ROOT_URLCONF = "Baymax.urls"
-
-# تحميل المتغيرات من ملف .env
-AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY")
-BASE_ID = os.getenv("BASE_ID")
-TABLE_NAME = os.getenv("TABLE_NAME")
-
-# Secret Key
+# **Secret Key**
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default-secret-key")
 
-# Debug and Allowed Hosts
+# **Debug and Allowed Hosts**
 DEBUG = True
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # التطبيق الأمامي المحلي
     "https://yourdomain.com",  # إذا كنت تستخدم دومين خارجي
@@ -651,18 +637,17 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "f04d-197-60-250-17.ngrok-free.app"]
 
 CORS_ALLOW_ALL_ORIGINS = True  # إذا كنت تريد السماح بكل النطاقات
 
-# Django REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",  # أو JWT إذا كنت تستخدمه
     ],
 }
 
-# إعدادات الأمان للكوكيز
+# **أمان الكوكيز**
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# الإعدادات الخاصة بالتطبيقات المثبتة في Django
+# **App Configuration**
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -680,28 +665,9 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "health",  # التطبيق الخاص بك
     "social_django",
-    "import_export",
 ]
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            BASE_DIR / "templates"
-        ],  # يمكنك تخصيص هذا المسار لمجلد القوالب الخاص بك
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
-# إعدادات الـ Middleware
+# **Middleware**
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -713,7 +679,42 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-# إعدادات قاعدة البيانات
+# **Caching**
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # تأكد من أن لديك Redis مثبتاً
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+# **URLs and Template settings**
+ROOT_URLCONF = "Baymax.urls"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),  # مسار مجلد القوالب العام
+        ],
+        "APP_DIRS": True,  # تأكد من أن هذا مضبوط على True لتمكين البحث في مجلدات التطبيقات
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+# **Wsgi Settings**
+WSGI_APPLICATION = "Baymax.wsgi.application"
+
+# **Database Settings**
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -725,7 +726,7 @@ DATABASES = {
     }
 }
 
-# إعدادات كلمات المرور
+# **Password Validation**
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -743,32 +744,43 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# إعدادات اللغة والتوقيت
+# **Internationalization & Localization**
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# إعدادات الملفات الثابتة والوسائط
+# **Static and Media Files**
 STATIC_URL = "static/"
 
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
+# **مسار ملفات الميديا (الملفات المرفوعة)**
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 
-# إعدادات تسجيل الدخول الاجتماعي (Google & Facebook)
+# **Authentication Settings for Social Login**
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+# **Allauth Settings**
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
+
+# **Social Auth Google & Facebook Settings**
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "your-google-client-id"
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "your-google-client-secret"
 SOCIAL_AUTH_FACEBOOK_KEY = "your-facebook-app-id"
 SOCIAL_AUTH_FACEBOOK_SECRET = "your-facebook-app-secret"
 
-# إعدادات Celery و Redis
+# **Celery and Redis Settings**
 CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_TIMEZONE = "Africa/Cairo"  # إذا كنت تريد استخدام توقيت القاهرة
 
 
 # import os

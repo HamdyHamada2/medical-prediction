@@ -950,139 +950,1249 @@
 #                 "status": "error",
 #                 "message": str(e)
 #             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# =============================================================================================================
+# اهم كود شغال
+# from django.shortcuts import render, redirect
+# from django.contrib.auth import authenticate, login
+# from django.contrib.auth.models import User
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from rest_framework.authtoken.models import Token
+# from rest_framework.permissions import AllowAny
+# from .models import HealthData
+# from .serializers import HealthDataSerializer
+# from rest_framework import generics
+#
+#
+# # دالة لتسجيل الدخول عبر HTML Template
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             login (request, user)
+#             return redirect ('home')  # إعادة توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
+#         else:
+#             return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+#
+#     return render (request, 'home.html')  # إذا كانت الطلبات من نوع GET، سيتم عرض صفحة تسجيل الدخول
+#
+#
+# # دالة لعرض الصفحة الرئيسية
+# def home_view(request):
+#     return render (request, 'home.html')
+#
+#
+# # دالة لتسجيل الدخول عبر API
+# class LoginView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get ('username')
+#         password = request.data.get ('password')
+#
+#         if not username or not password:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Both username and password are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             token, created = Token.objects.get_or_create (user=user)
+#             return Response ({
+#                 "status": "success",
+#                 "message": "Login successful",
+#                 "token": token.key
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Invalid credentials."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# # تسجيل مستخدم جديد
+# class RegisterView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get ("username")
+#         password = request.data.get ("password")
+#         email = request.data.get ("email")
+#         fname = request.data.get ("Fname")
+#         lname = request.data.get ("Lname")
+#
+#         # التحقق من الحقول المطلوبة
+#         if not username or not password or not email or not fname or not lname:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "All fields are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             if User.objects.filter (username=username).exists () or User.objects.filter (email=email).exists ():
+#                 return Response ({
+#                     "status": "error",
+#                     "message": "Username or email already exists."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             user = User.objects.create_user (username=username, password=password, email=email)
+#             user.first_name = fname
+#             user.last_name = lname
+#             user.save ()
+#
+#             return Response ({
+#                 "status": "success",
+#                 "message": "User registered successfully."
+#             }, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# # API لعرض بيانات الصحة
+# class HealthDataListCreateView (generics.ListCreateAPIView):
+#     queryset = HealthData.objects.all ()
+#     serializer_class = HealthDataSerializer
+#
+#
+# # API للتنبؤ بالحالة الصحية
+# class HealthPredictionAPIView (APIView):
+#     def post(self, request, *args, **kwargs):
+#         # استلام البيانات من الطلب
+#         data = request.data
+#         # منطق التنبؤ بالحالة الصحية (تحديثه حسب المشروع)
+#         prediction_result = {"message": "Prediction logic not implemented yet"}
+#         return Response (prediction_result, status=status.HTTP_200_OK)
+# ==================================================================================
+# from django.shortcuts import render, redirect
+# from django.contrib.auth import authenticate, login
+# from django.http import JsonResponse, HttpResponse
+# from django.contrib.auth.models import User
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status, generics
+# from rest_framework.authtoken.models import Token
+# from rest_framework.permissions import AllowAny
+# from .models import HealthData, AiModels, Disease, Diagnosis
+# from .serializers import HealthDataSerializer
+# from .forms import UploadFileForm
+# from .models import UploadedFile
+# from django.core.files.storage import FileSystemStorage
+#
+#
+# # دالة لتسجيل الدخول عبر HTML Template
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             login (request, user)
+#             return redirect ('home')  # إعادة توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
+#         else:
+#             return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+#
+#     return render (request, 'home.html')  # إذا كانت الطلبات من نوع GET، سيتم عرض صفحة تسجيل الدخول
+#
+#
+# # دالة لعرض الصفحة الرئيسية
+# def home_view(request):
+#     return render (request, 'home.html')
+#
+#
+# # API لعرض بيانات الصحة
+# class HealthDataListCreateView (generics.ListCreateAPIView):
+#     queryset = HealthData.objects.all ()
+#     serializer_class = HealthDataSerializer
+#
+#
+# # API للتنبؤ بالحالة الصحية
+# class HealthPredictionAPIView (APIView):
+#     def post(self, request, *args, **kwargs):
+#         data = request.data
+#         prediction_result = {"message": "Prediction logic not implemented yet"}
+#         return Response (prediction_result, status=status.HTTP_200_OK)
+#
+#
+# # API لعرض بيانات HealthData
+# def get_health_data(request):
+#     if request.method == 'GET':
+#         data = list (HealthData.objects.values ())
+#         return JsonResponse ({'status': 'success', 'data': data}, safe=False)
+#     return JsonResponse ({'status': 'error', 'message': 'Invalid HTTP method'}, status=400)
+#
+#
+# # تسجيل مستخدم جديد
+# class RegisterView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get ("username")
+#         password = request.data.get ("password")
+#         email = request.data.get ("email")
+#         fname = request.data.get ("Fname")
+#         lname = request.data.get ("Lname")
+#
+#         if not username or not password or not email or not fname or not lname:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "All fields are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             if User.objects.filter (username=username).exists () or User.objects.filter (email=email).exists ():
+#                 return Response ({
+#                     "status": "error",
+#                     "message": "Username or email already exists."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             user = User.objects.create_user (username=username, password=password, email=email)
+#             user.first_name = fname
+#             user.last_name = lname
+#             user.save ()
+#
+#             return Response ({
+#                 "status": "success",
+#                 "message": "User registered successfully."
+#             }, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# # دالة لتسجيل الدخول عبر API
+# class LoginView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get ('username')
+#         password = request.data.get ('password')
+#
+#         if not username or not password:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Both username and password are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             token, created = Token.objects.get_or_create (user=user)
+#             return Response ({
+#                 "status": "success",
+#                 "message": "Login successful",
+#                 "token": token.key
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Invalid credentials."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# # دالة لرفع الملفات من مجلد
+# def upload_files_view(request):
+#     if request.method == 'POST' and 'file' in request.FILES:
+#         file = request.FILES['file']
+#
+#         # استخدام FileSystemStorage بدلاً من حفظ الملف يدويًا
+#         fs = FileSystemStorage()
+#         file_name = fs.save(file.name, file)
+#         file_url = fs.url(file_name)
+#
+#         # إرجاع رسالة للمستخدم مع الرابط إلى الملف
+#         return render(request, 'upload.html', {'message': 'File uploaded successfully!', 'file_url': file_url})
+#
+#     return render(request, 'upload.html', {'message': 'No file attached or invalid request.'})
+# ===========================
+# def upload_files_view(request):
+#     if request.method == 'POST':
+#         # منطق رفع الملفات هنا
+#         return HttpResponse('File uploaded successfully!')
+#     return render(request, 'upload.html')  # أو صفحة أخرى
+
+# import pickle
+# import pandas as pd
+# import os
+# from django.shortcuts import render, redirect
+# from django.core.files.storage import FileSystemStorage
+# from django.conf import settings
+# from django.http import JsonResponse
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from rest_framework.permissions import AllowAny
+# from django.contrib.auth import authenticate, login
+# from .models import HealthData, AiModels, Disease, Diagnosis
+# from .serializers import HealthDataSerializer, AiModelsSerializer
+# from .forms import UploadFileForm
+# from django.contrib.auth.models import User
+# from rest_framework.authtoken.models import Token
+# from django.views.decorators.csrf import csrf_exempt
+# from django.utils.decorators import method_decorator
+# import logging
+#
+#
+# # دالة لتسجيل الدخول عبر HTML Template
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             login (request, user)
+#             return redirect ('home')
+#         else:
+#             return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+#
+#     return render (request, 'home.html')
+#
+#
+# # دالة لعرض الصفحة الرئيسية
+# def home_view(request):
+#     return render (request, 'home.html')
+#
+#
+# # API لعرض بيانات الصحة
+# class HealthDataListCreateView (APIView):
+#     queryset = HealthData.objects.all ()
+#     serializer_class = HealthDataSerializer
+#
+#     def get(self, request):
+#         health_data = HealthData.objects.all ()
+#         serializer = HealthDataSerializer (health_data, many=True)
+#         return Response (serializer.data)
+#
+#     def post(self, request):
+#         serializer = HealthDataSerializer (data=request.data)
+#         if serializer.is_valid ():
+#             serializer.save ()
+#             return Response (serializer.data, status=status.HTTP_201_CREATED)
+#         return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# # API للتنبؤ بالحالة الصحية
+# class HealthPredictionAPIView (APIView):
+#     def post(self, request, *args, **kwargs):
+#         input_data = request.data.get ("features")
+#
+#         if not input_data:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Features are required for prediction."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             model_path = "path/to/your/model.pkl"
+#             with open (model_path, "rb") as model_file:
+#                 model = pickle.load (model_file)
+#
+#             prediction = model.predict ([input_data])
+#
+#             return Response ({
+#                 "status": "success",
+#                 "prediction": prediction[0]
+#             }, status=status.HTTP_200_OK)
+#
+#         except Exception as e:
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# # دالة لرفع الملفات
+# def upload_files_view(request):
+#     message = ''
+#     file_url = None
+#
+#     if request.method == 'POST':
+#         form = UploadFileForm (request.POST, request.FILES)
+#         if form.is_valid ():
+#             file = request.FILES['file']
+#             try:
+#                 fs = FileSystemStorage ()
+#                 file_name = fs.save (file.name, file)
+#                 file_url = fs.url (file_name)
+#
+#                 message = f"تم رفع الملف بنجاح: {file.name}"
+#
+#                 file_path = os.path.join (settings.UPLOAD_FOLDER, file.name)
+#                 df = pd.read_csv (file_path) if file.name.endswith ('.csv') else pd.read_excel (file_path)
+#
+#                 # الآن نقوم بإضافة البيانات إلى HealthData
+#                 for index, row in df.iterrows ():
+#                     health_data = HealthData.objects.create (
+#                         glucose=row.get ('glucose', ''),
+#                         cholesterol=row.get ('cholesterol', ''),
+#                         hemoglobin=row.get ('hemoglobin', ''),
+#                         heart_disease=row.get ('heart_disease', ''),
+#                         diabetes=row.get ('diabetes', ''),
+#                         age=row.get ('age', ''),
+#                         sex=row.get ('sex', ''),
+#                     )
+#
+#             except Exception as e:
+#                 message = f"حدث خطأ أثناء رفع الملف: {str (e)}"
+#         else:
+#             message = 'الملف غير صالح أو هناك مشكلة في النموذج.'
+#     else:
+#         form = UploadFileForm ()
+#
+#     return render (request, 'healthdata_changelist.html', {'form': form, 'message': message, 'file_url': file_url})
+#
+#
+# # API لعرض AiModels
+# class AiModelsList (APIView):
+#     def get(self, request):
+#         ai_models = AiModels.objects.all ()
+#         serializer = AiModelsSerializer (ai_models, many=True)
+#         return Response (serializer.data, status=status.HTTP_200_OK)
+#
+#
+# # دالة لإدارة نموذج AIModels
+# class AIModelsListCreateView (APIView):
+#     AiModels.objects.all ()
+#     serializer_class = AiModelsSerializer
+#
+#
+# # API لعرض بيانات HealthData
+# def get_health_data(request):
+#     if request.method == 'GET':
+#         data = list (HealthData.objects.values ())
+#         return JsonResponse ({'status': 'success', 'data': data}, safe=False)
+#     return JsonResponse ({'status': 'error', 'message': 'Invalid HTTP method'}, status=400)
+#
+#
+# # تسجيل مستخدم جديد عبر API
+# class RegisterView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get ("username")
+#         password = request.data.get ("password")
+#         email = request.data.get ("email")
+#         fname = request.data.get ("Fname")
+#         lname = request.data.get ("Lname")
+#
+#         if not username or not password or not email or not fname or not lname:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "All fields are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             if User.objects.filter (username=username).exists () or User.objects.filter (email=email).exists ():
+#                 return Response ({
+#                     "status": "error",
+#                     "message": "Username or email already exists."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             user = User.objects.create_user (username=username, password=password, email=email)
+#             user.first_name = fname
+#             user.last_name = lname
+#             user.save ()
+#
+#             return Response ({
+#                 "status": "success",
+#                 "message": "User registered successfully."
+#             }, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# # دالة لتسجيل الدخول عبر API
+# # class LoginView(APIView):
+# #     permission_classes = [AllowAny]
+# #
+# #     def post(self, request):
+# #         username = request.data.get('username')
+# #         password = request.data.get('password')
+# #
+# #         if not username or not password:
+# #             return Response({
+# #                 "status": "error",
+# #                 "message": "Both username and password are required."
+# #             }, status=status.HTTP_400_BAD_REQUEST)
+# #
+# #         user = authenticate(request, username=username, password=password)
+# #
+# #         if user is not None:
+# #             token, created = Token.objects.get_or_create(user=user)
+# #             return Response({
+# #                 "status": "success",
+# #                 "message": "Login successful",
+# #                 "token": token.key
+# #             }, status=status.HTTP_200_OK)
+# #         else:
+# #             return Response({
+# #                 "status": "error",
+# #                 "message": "Invalid credentials."
+# #             }, status=status.HTTP_400_BAD_REQUEST)
+# @method_decorator (csrf_exempt, name='dispatch')
+# class LoginView (APIView):
+#     permission_classes = [AllowAny]  # يسمح بالوصول للمستخدمين غير المسجلين
+#
+#     def post(self, request):
+#         # الحصول على اسم المستخدم وكلمة المرور من البيانات الواردة
+#         username = request.data.get ('username')
+#         password = request.data.get ('password')
+#
+#         # التحقق من أن البيانات المدخلة موجودة
+#         if not username or not password:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Both username and password are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         # التحقق من صحة بيانات المستخدم
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             # إذا كانت بيانات المستخدم صحيحة، قم بإنشاء التوكن
+#             token, created = Token.objects.get_or_create (user=user)
+#             return Response ({
+#                 "status": "success",
+#                 "message": "Login successful",
+#                 "token": token.key  # التوكن المستخدم للمصادقة لاحقًا
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Invalid credentials."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# logging.basicConfig(filename='logs/debug.log', level=logging.WARNING)
+# logging.debug ('This is a debug message.')
+#
+#
+# def my_view(request):
+#     logging.debug ('My view was called.')
+#     return HttpResponse ('Hello, logs!')
+
+# import pickle
+# import pandas as pd
+# import os
+# from django.shortcuts import render, redirect
+# from django.core.files.storage import FileSystemStorage
+# from django.conf import settings
+# from django.http import JsonResponse
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from rest_framework.permissions import AllowAny
+# from django.contrib.auth import authenticate, login
+# from .models import HealthData, AiModels, Disease, Diagnosis
+# from .serializers import HealthDataSerializer, AiModelsSerializer
+# from .forms import UploadFileForm
+# from django.contrib.auth.models import User
+# from rest_framework.authtoken.models import Token
+# from django.views.decorators.csrf import csrf_exempt
+# from django.utils.decorators import method_decorator
+# import logging
+# from rest_framework.decorators import api_view
+# from django.contrib.auth import authenticate
+# # from django.contrib.auth.hashers import make_password
+# from rest_framework.authtoken.models import Token
+#
+#
+#
+# # دالة لتسجيل الدخول عبر HTML Template
+# # def login_view(request):
+# #     if request.method == 'POST':
+# #         username = request.POST['username']
+# #         password = request.POST['password']
+# #         user = authenticate (request, username=username, password=password)
+# #
+# #         if user is not None:
+# #             login (request, user)
+# #             return redirect ('home')
+# #         else:
+# #             return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+# #
+# #     return render (request, 'home.html')
+#
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             login (request, user)
+#             return redirect ('home')
+#         else:
+#             return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+#
+#     return render (request, 'home.html')
+#
+#
+# # دالة لعرض الصفحة الرئيسية
+# def home_view(request):
+#     return render (request, 'home.html')
+#
+#
+# # API لعرض بيانات الصحة
+# class HealthDataListCreateView (APIView):
+#     queryset = HealthData.objects.all ()
+#     serializer_class = HealthDataSerializer
+#
+#     def get(self, request):
+#         health_data = HealthData.objects.all ()
+#         serializer = HealthDataSerializer (health_data, many=True)
+#         return Response (serializer.data)
+#
+#     def post(self, request):
+#         serializer = HealthDataSerializer (data=request.data)
+#         if serializer.is_valid ():
+#             serializer.save ()
+#             return Response (serializer.data, status=status.HTTP_201_CREATED)
+#         return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# # API للتنبؤ بالحالة الصحية
+# class HealthPredictionAPIView (APIView):
+#     def post(self, request, *args, **kwargs):
+#         input_data = request.data.get ("features")
+#
+#         if not input_data:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "Features are required for prediction."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             model_path = "path/to/your/model.pkl"
+#             with open (model_path, "rb") as model_file:
+#                 model = pickle.load (model_file)
+#
+#             prediction = model.predict ([input_data])
+#
+#             return Response ({
+#                 "status": "success",
+#                 "prediction": prediction[0]
+#             }, status=status.HTTP_200_OK)
+#
+#         except Exception as e:
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# # دالة لرفع الملفات
+# def upload_files_view(request):
+#     message = ''
+#     file_url = None
+#
+#     if request.method == 'POST':
+#         form = UploadFileForm (request.POST, request.FILES)
+#         if form.is_valid ():
+#             file = request.FILES['file']
+#             try:
+#                 fs = FileSystemStorage ()
+#                 file_name = fs.save (file.name, file)
+#                 file_url = fs.url (file_name)
+#
+#                 message = f"تم رفع الملف بنجاح: {file.name}"
+#
+#                 file_path = os.path.join (settings.UPLOAD_FOLDER, file.name)
+#                 df = pd.read_csv (file_path) if file.name.endswith ('.csv') else pd.read_excel (file_path)
+#
+#                 # الآن نقوم بإضافة البيانات إلى HealthData
+#                 for index, row in df.iterrows ():
+#                     health_data = HealthData.objects.create (
+#                         glucose=row.get ('glucose', ''),
+#                         cholesterol=row.get ('cholesterol', ''),
+#                         hemoglobin=row.get ('hemoglobin', ''),
+#                         heart_disease=row.get ('heart_disease', ''),
+#                         diabetes=row.get ('diabetes', ''),
+#                         age=row.get ('age', ''),
+#                         sex=row.get ('sex', ''),
+#                     )
+#
+#             except Exception as e:
+#                 message = f"حدث خطأ أثناء رفع الملف: {str (e)}"
+#         else:
+#             message = 'الملف غير صالح أو هناك مشكلة في النموذج.'
+#     else:
+#         form = UploadFileForm ()
+#
+#     return render (request, 'healthdata_changelist.html', {'form': form, 'message': message, 'file_url': file_url})
+#
+#
+# # API لعرض AiModels
+# class AiModelsList (APIView):
+#     def get(self, request):
+#         ai_models = AiModels.objects.all ()
+#         serializer = AiModelsSerializer (ai_models, many=True)
+#         return Response (serializer.data, status=status.HTTP_200_OK)
+#
+#
+# # دالة لإدارة نموذج AIModels
+# class AIModelsListCreateView (APIView):
+#     AiModels.objects.all ()
+#     serializer_class = AiModelsSerializer
+#
+#
+# # API لعرض بيانات HealthData
+# def get_health_data(request):
+#     if request.method == 'GET':
+#         data = list (HealthData.objects.values ())
+#         return JsonResponse ({'status': 'success', 'data': data}, safe=False)
+#     return JsonResponse ({'status': 'error', 'message': 'Invalid HTTP method'}, status=400)
+#
+#
+# # تسجيل مستخدم جديد عبر API
+# class RegisterView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get ("username")
+#         password = request.data.get ("password")
+#         email = request.data.get ("email")
+#         fname = request.data.get ("Fname")
+#         lname = request.data.get ("Lname")
+#
+#         if not username or not password or not email or not fname or not lname:
+#             return Response ({
+#                 "status": "error",
+#                 "message": "All fields are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             if User.objects.filter (username=username).exists () or User.objects.filter (email=email).exists ():
+#                 return Response ({
+#                     "status": "error",
+#                     "message": "Username or email already exists."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             user = User.objects.create_user (username=username, password=password, email=email)
+#             user.first_name = fname
+#             user.last_name = lname
+#             user.save ()
+#
+#             return Response ({
+#                 "status": "success",
+#                 "message": "User registered successfully."
+#             }, status=status.HTTP_201_CREATED)
+#         except Exception as e:
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# logger = logging.getLogger (__name__)
+#
+#
+# @method_decorator (csrf_exempt, name='dispatch')
+# class LoginView (APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         try:
+#             # استخراج بيانات المستخدم من الطلب
+#             username = request.data.get ('username')
+#             password = request.data.get ('password')
+#
+#             if not username or not password:
+#                 return Response ({
+#                     "status": "error",
+#                     "message": "Both username and password are required."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             # محاولة المصادقة
+#             user = authenticate (request, username=username, password=password)
+#
+#             # إذا كانت المصادقة فاشلة، سجل محاولة الدخول الفاشلة
+#             if user is None:
+#                 logger.error (f"Failed login attempt for {username}")
+#                 return Response ({
+#                     "status": "error",
+#                     "message": "Invalid credentials."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             # إذا كانت المصادقة ناجحة، أنشئ التوكن للمستخدم
+#             token, created = Token.objects.get_or_create (user=user)
+#             return Response ({
+#                 "status": "success",
+#                 "message": "Login successful",
+#                 "token": token.key
+#             }, status=status.HTTP_200_OK)
+#
+#         except Exception as e:
+#             logger.error (f"Login error: {e}")
+#             return Response ({
+#                 "status": "error",
+#                 "message": str (e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# # دالة لتسجيل الدخول عبر API
+# # class LoginView(APIView):
+# #     permission_classes = [AllowAny]
+# #
+# #     def post(self, request):
+# #         username = request.data.get('username')
+# #         password = request.data.get('password')
+# #
+# #         if not username or not password:
+# #             return Response({
+# #                 "status": "error",
+# #                 "message": "Both username and password are required."
+# #             }, status=status.HTTP_400_BAD_REQUEST)
+# #
+# #         user = authenticate(request, username=username, password=password)
+# #
+# #         if user is not None:
+# #             token, created = Token.objects.get_or_create(user=user)
+# #             return Response({
+# #                 "status": "success",
+# #                 "message": "Login successful",
+# #                 "token": token.key
+# #             }, status=status.HTTP_200_OK)
+# #         else:
+# #             return Response({
+# #                 "status": "error",
+# #                 "message": "Invalid credentials."
+# #             }, status=status.HTTP_400_BAD_REQUEST)
+#
+# @api_view (['POST'])
+# def login_view(request):
+#     username = request.data.get ('username')  # استخدام request.data لاستخراج الحقول
+#     password = request.data.get ('password')
+#     user = authenticate (username=username, password=password)  # تحقق من كلمة المرور المشفرة
+#
+#     if not username or not password:
+#         return Response ({"error": "Username and password are required"}, status=400)
+#
+#     user = authenticate (request, username=username, password=password)
+#     if user:
+#         return Response ({"message": "Login successful"}, status=200)
+#     else:
+#         return Response ({"error": "Invalid credentials"}, status=401)
+#
+#
+# @method_decorator (csrf_exempt, name='dispatch')
+# class LoginView(APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         try:
+#             username = request.data.get('username')
+#             password = request.data.get('password')
+#
+#             if not username or not password:
+#                 return Response({
+#                     "status": "error",
+#                     "message": "Both username and password are required."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#
+#             user = authenticate(request, username=username, password=password)
+#
+#             if user is not None:
+#                 # هنا يجب أن يكون user معرفًا بشكل صحيح
+#                 token, created = Token.objects.get_or_create(user=user)
+#                 return Response({
+#                     "status": "success",
+#                     "message": "Login successful",
+#                     "token": token.key
+#                 }, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({
+#                     "status": "error",
+#                     "message": "Invalid credentials."
+#                 }, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             logger.error(f"Login error: {e}")
+#             return Response({
+#                 "status": "error",
+#                 "message": str(e)
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+# @csrf_exempt
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST.get ('username')
+#         password = request.POST.get ('password')
+#         user = authenticate (request, username=username, password=password)
+#         if user:
+#             token, created = Token.objects.get_or_create (user=user)
+#             return JsonResponse ({'token': token.key})
+#         return JsonResponse ({'error': 'Invalid credentials'}, status=400)
+#
+#
+#
 
 
+import pickle
+import pandas as pd
+import os
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
-from .models import HealthData
-from .serializers import HealthDataSerializer
-from rest_framework import generics
+from django.contrib.auth import authenticate, login
+from .models import HealthData, AiModels, Disease, Diagnosis
+from .serializers import HealthDataSerializer, AiModelsSerializer
+from .forms import UploadFileForm
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import logging
+from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate
+# from django.contrib.auth.hashers import make_password
+from rest_framework.authtoken.models import Token
+
 
 
 # دالة لتسجيل الدخول عبر HTML Template
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate (request, username=username, password=password)
+#
+#         if user is not None:
+#             login (request, user)
+#             return redirect ('home')
+#         else:
+#             return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
+#
+#     return render (request, 'home.html')
+
 def login_view(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate (request, username=username, password=password)
 
         if user is not None:
-            login(request, user)
-            return redirect(
-                "home"
-            )  # إعادة توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
+            login (request, user)
+            return redirect ('home')
         else:
-            return render(request, "home.html", {"error": "بيانات الدخول غير صحيحة"})
+            return render (request, 'home.html', {'error': 'بيانات الدخول غير صحيحة'})
 
-    return render(
-        request, "home.html"
-    )  # إذا كانت الطلبات من نوع GET، سيتم عرض صفحة تسجيل الدخول
+    return render (request, 'home.html')
 
 
 # دالة لعرض الصفحة الرئيسية
 def home_view(request):
-    return render(request, "home.html")
+    return render (request, 'home.html')
+
+
+# API لعرض بيانات الصحة
+class HealthDataListCreateView (APIView):
+    queryset = HealthData.objects.all ()
+    serializer_class = HealthDataSerializer
+
+    def get(self, request):
+        health_data = HealthData.objects.all ()
+        serializer = HealthDataSerializer (health_data, many=True)
+        return Response (serializer.data)
+
+    def post(self, request):
+        serializer = HealthDataSerializer (data=request.data)
+        if serializer.is_valid ():
+            serializer.save ()
+            return Response (serializer.data, status=status.HTTP_201_CREATED)
+        return Response (serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# API للتنبؤ بالحالة الصحية
+class HealthPredictionAPIView (APIView):
+    def post(self, request, *args, **kwargs):
+        input_data = request.data.get ("features")
+
+        if not input_data:
+            return Response ({
+                "status": "error",
+                "message": "Features are required for prediction."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            model_path = "path/to/your/model.pkl"
+            with open (model_path, "rb") as model_file:
+                model = pickle.load (model_file)
+
+            prediction = model.predict ([input_data])
+
+            return Response ({
+                "status": "success",
+                "prediction": prediction[0]
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response ({
+                "status": "error",
+                "message": str (e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# دالة لرفع الملفات
+def upload_files_view(request):
+    message = ''
+    file_url = None
+
+    if request.method == 'POST':
+        form = UploadFileForm (request.POST, request.FILES)
+        if form.is_valid ():
+            file = request.FILES['file']
+            try:
+                fs = FileSystemStorage ()
+                file_name = fs.save (file.name, file)
+                file_url = fs.url (file_name)
+
+                message = f"تم رفع الملف بنجاح: {file.name}"
+
+                file_path = os.path.join (settings.UPLOAD_FOLDER, file.name)
+                df = pd.read_csv (file_path) if file.name.endswith ('.csv') else pd.read_excel (file_path)
+
+                # الآن نقوم بإضافة البيانات إلى HealthData
+                for index, row in df.iterrows ():
+                    health_data = HealthData.objects.create (
+                        glucose=row.get ('glucose', ''),
+                        cholesterol=row.get ('cholesterol', ''),
+                        hemoglobin=row.get ('hemoglobin', ''),
+                        heart_disease=row.get ('heart_disease', ''),
+                        diabetes=row.get ('diabetes', ''),
+                        age=row.get ('age', ''),
+                        sex=row.get ('sex', ''),
+                    )
+
+            except Exception as e:
+                message = f"حدث خطأ أثناء رفع الملف: {str (e)}"
+        else:
+            message = 'الملف غير صالح أو هناك مشكلة في النموذج.'
+    else:
+        form = UploadFileForm ()
+
+    return render (request, 'healthdata_changelist.html', {'form': form, 'message': message, 'file_url': file_url})
+
+
+# API لعرض AiModels
+class AiModelsList (APIView):
+    def get(self, request):
+        ai_models = AiModels.objects.all ()
+        serializer = AiModelsSerializer (ai_models, many=True)
+        return Response (serializer.data, status=status.HTTP_200_OK)
+
+
+# دالة لإدارة نموذج AIModels
+class AIModelsListCreateView (APIView):
+    AiModels.objects.all ()
+    serializer_class = AiModelsSerializer
+
+
+# API لعرض بيانات HealthData
+def get_health_data(request):
+    if request.method == 'GET':
+        data = list (HealthData.objects.values ())
+        return JsonResponse ({'status': 'success', 'data': data}, safe=False)
+    return JsonResponse ({'status': 'error', 'message': 'Invalid HTTP method'}, status=400)
+
+
+# تسجيل مستخدم جديد عبر API
+class RegisterView (APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get ("username")
+        password = request.data.get ("password")
+        email = request.data.get ("email")
+        fname = request.data.get ("Fname")
+        lname = request.data.get ("Lname")
+
+        if not username or not password or not email or not fname or not lname:
+            return Response ({
+                "status": "error",
+                "message": "All fields are required."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            if User.objects.filter (username=username).exists () or User.objects.filter (email=email).exists ():
+                return Response ({
+                    "status": "error",
+                    "message": "Username or email already exists."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            user = User.objects.create_user (username=username, password=password, email=email)
+            user.first_name = fname
+            user.last_name = lname
+            user.save ()
+
+            return Response ({
+                "status": "success",
+                "message": "User registered successfully."
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response ({
+                "status": "error",
+                "message": str (e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+logger = logging.getLogger (__name__)
+
+
+@method_decorator (csrf_exempt, name='dispatch')
+class LoginView (APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            # استخراج بيانات المستخدم من الطلب
+            username = request.data.get ('username')
+            password = request.data.get ('password')
+
+            if not username or not password:
+                return Response ({
+                    "status": "error",
+                    "message": "Both username and password are required."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # محاولة المصادقة
+            user = authenticate (request, username=username, password=password)
+
+            # إذا كانت المصادقة فاشلة، سجل محاولة الدخول الفاشلة
+            if user is None:
+                logger.error (f"Failed login attempt for {username}")
+                return Response ({
+                    "status": "error",
+                    "message": "Invalid credentials."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # إذا كانت المصادقة ناجحة، أنشئ التوكن للمستخدم
+            token, created = Token.objects.get_or_create (user=user)
+            return Response ({
+                "status": "success",
+                "message": "Login successful",
+                "token": token.key
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error (f"Login error: {e}")
+            return Response ({
+                "status": "error",
+                "message": str (e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # دالة لتسجيل الدخول عبر API
+# class LoginView(APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         username = request.data.get('username')
+#         password = request.data.get('password')
+#
+#         if not username or not password:
+#             return Response({
+#                 "status": "error",
+#                 "message": "Both username and password are required."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         user = authenticate(request, username=username, password=password)
+#
+#         if user is not None:
+#             token, created = Token.objects.get_or_create(user=user)
+#             return Response({
+#                 "status": "success",
+#                 "message": "Login successful",
+#                 "token": token.key
+#             }, status=status.HTTP_200_OK)
+#         else:
+#             return Response({
+#                 "status": "error",
+#                 "message": "Invalid credentials."
+#             }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view (['POST'])
+def login_view(request):
+    username = request.data.get ('username')  # استخدام request.data لاستخراج الحقول
+    password = request.data.get ('password')
+    user = authenticate (username=username, password=password)  # تحقق من كلمة المرور المشفرة
+
+    if not username or not password:
+        return Response ({"error": "Username and password are required"}, status=400)
+
+    user = authenticate (request, username=username, password=password)
+    if user:
+        return Response ({"message": "Login successful"}, status=200)
+    else:
+        return Response ({"error": "Invalid credentials"}, status=401)
+
+
+@method_decorator (csrf_exempt, name='dispatch')
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
+        try:
+            username = request.data.get('username')
+            password = request.data.get('password')
 
-        if not username or not password:
-            return Response(
-                {
+            if not username or not password:
+                return Response({
                     "status": "error",
-                    "message": "Both username and password are required.",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                    "message": "Both username and password are required."
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(request, username=username, password=password)
+            user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response(
-                {
+            if user is not None:
+                # هنا يجب أن يكون user معرفًا بشكل صحيح
+                token, created = Token.objects.get_or_create(user=user)
+                return Response({
                     "status": "success",
                     "message": "Login successful",
-                    "token": token.key,
-                },
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"status": "error", "message": "Invalid credentials."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-
-# تسجيل مستخدم جديد
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        email = request.data.get("email")
-        fname = request.data.get("Fname")
-        lname = request.data.get("Lname")
-
-        # التحقق من الحقول المطلوبة
-        if not username or not password or not email or not fname or not lname:
-            return Response(
-                {"status": "error", "message": "All fields are required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            if (
-                User.objects.filter(username=username).exists()
-                or User.objects.filter(email=email).exists()
-            ):
-                return Response(
-                    {"status": "error", "message": "Username or email already exists."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            user = User.objects.create_user(
-                username=username, password=password, email=email
-            )
-            user.first_name = fname
-            user.last_name = lname
-            user.save()
-
-            return Response(
-                {"status": "success", "message": "User registered successfully."},
-                status=status.HTTP_201_CREATED,
-            )
+                    "token": token.key
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "status": "error",
+                    "message": "Invalid credentials."
+                }, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response(
-                {"status": "error", "message": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            logger.error(f"Login error: {e}")
+            return Response({
+                "status": "error",
+                "message": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get ('username')
+        password = request.POST.get ('password')
+        user = authenticate (request, username=username, password=password)
+        if user:
+            token, created = Token.objects.get_or_create (user=user)
+            return JsonResponse ({'token': token.key})
+        return JsonResponse ({'error': 'Invalid credentials'}, status=400)
 
 
-# API لعرض بيانات الصحة
-class HealthDataListCreateView(generics.ListCreateAPIView):
-    queryset = HealthData.objects.all()
-    serializer_class = HealthDataSerializer
 
-
-# API للتنبؤ بالحالة الصحية
-class HealthPredictionAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        # استلام البيانات من الطلب
-        data = request.data
-        # منطق التنبؤ بالحالة الصحية (تحديثه حسب المشروع)
-        prediction_result = {"message": "Prediction logic not implemented yet"}
-        return Response(prediction_result, status=status.HTTP_200_OK)
