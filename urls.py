@@ -179,61 +179,6 @@
 #     path('upload/', upload_files_view, name='upload_file'),  # رفع الملف
 # ]
 
-# from django.urls import path
-# from django.contrib.auth import views as auth_views
-# from .views import (
-#     import_data_from_airtable,
-#     login_view,
-#     HealthDataListCreateView,
-#     HealthPredictionAPIView,
-#     upload_files_view,
-#     AiModelsAPIView,
-#     get_health_data,
-#     RegisterView,
-#     LoginView,
-#     home_view,
-#     AIModelsListCreateView,  # لإدارة نموذج AIModels
-#     AiModelsList,  # عرض قائمة النماذج
-# )
-#
-# urlpatterns = [
-#     # مسار تسجيل مستخدم جديد
-#     path("register/", RegisterView.as_view(), name="register"),
-#     # مسار تسجيل الدخول باستخدام API
-#     path("login-api/", LoginView.as_view(), name="login_api"),
-#     # مسار تسجيل الدخول باستخدام HTML Template
-#     path("login/", login_view, name="login"),
-#     # مسار تسجيل الخروج
-#     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
-#     # مسار الصفحة الرئيسية بعد تسجيل الدخول
-#     path("home/", home_view, name="home"),
-#     # مسار عرض البيانات الصحية أو إضافتها
-#     path(
-#         "health-data/",
-#         HealthDataListCreateView.as_view(),
-#         name="health_data_list_create",
-#     ),
-#     # مسار إضافي لعرض البيانات الصحية (اختياري بناءً على الطلب)
-#     path(
-#         "data/", HealthDataListCreateView.as_view(), name="health_data_list_create_alt"
-#     ),
-#     # مسار استدعاء البيانات الصحية عبر دالة `get_health_data`
-#     path("get-health-data/", get_health_data, name="get_health_data"),
-#     # مسار التنبؤ بالحالات الصحية
-#     path("predict/", HealthPredictionAPIView.as_view(), name="health_prediction"),
-#     # مسار رفع الملفات من مجلد
-#     path("upload/", upload_files_view, name="upload_file"),
-#     # مسار عرض أو إنشاء AIModels
-#     path("ai-models/", AIModelsListCreateView.as_view(), name="ai_models_list_create"),
-#     # مسار عرض النماذج AI
-#     path("ai-models-list/", AiModelsList.as_view(), name="ai_models_list"),
-#     # مسار استيراد البيانات من Airtable
-#     path("import/", import_data_from_airtable, name="import_data"),
-#     # مسار عرض التنبؤ باستخدام AIModels
-#     path("ai-models/", AiModelsAPIView.as_view(), name="ai_models"),
-# ]
-
-
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from .views import (
@@ -245,37 +190,41 @@ from .views import (
     login_view,
     home_view,
     upload_files_view,
+    AIModelsListCreateView,  # لإدارة نموذج AIModels
+    AiModelsList,  # إضافة هذا السطر لعرض قائمة النماذج
 )
 
 urlpatterns = [
     # مسار تسجيل مستخدم جديد
-    path('register/', RegisterView.as_view(), name='register'),
-
+    path("register/", RegisterView.as_view(), name="register"),
     # مسار تسجيل الدخول باستخدام API
-    path('login-api/', LoginView.as_view(), name='login_api'),
-
+    path("login-api/", LoginView.as_view(), name="login_api"),
     # مسار تسجيل الدخول باستخدام HTML Template
-    path('login/', login_view, name='login'),
-    path ('login/', LoginView.as_view (), name='login'),
-
+    path("login/", login_view, name="login"),
     # مسار تسجيل الخروج
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     # مسار الصفحة الرئيسية بعد تسجيل الدخول
-    path('home/', home_view, name='home'),
-
+    path("home/", home_view, name="home"),
     # مسار عرض البيانات الصحية أو إضافتها
-    path('health-data/', HealthDataListCreateView.as_view(), name='health_data_list_create'),
-
+    path(
+        "health-data/",
+        HealthDataListCreateView.as_view(),
+        name="health_data_list_create",
+    ),
     # مسار إضافي لعرض البيانات الصحية (اختياري بناءً على الطلب)
-    path('data/', HealthDataListCreateView.as_view(), name='health_data_list_create_alt'),
-
+    path(
+        "data/", HealthDataListCreateView.as_view(), name="health_data_list_create_alt"
+    ),
     # مسار استدعاء البيانات الصحية عبر دالة `get_health_data`
-    path('get-health-data/', get_health_data, name='get_health_data'),
-
+    path("get-health-data/", get_health_data, name="get_health_data"),
     # مسار التنبؤ بالحالات الصحية
-    path('predict/', HealthPredictionAPIView.as_view(), name='health_prediction'),
-
+    path("predict/", HealthPredictionAPIView.as_view(), name="health_prediction"),
     # مسار رفع الملفات من مجلد
-    path('upload/', upload_files_view, name='upload_file'),  # رفع الملف
+    path("upload/", upload_files_view, name="upload_file"),  # رفع الملف
+    # مسار عرض أو إنشاء AIModels
+    path("ai-models/", AIModelsListCreateView.as_view(), name="ai_models_list_create"),
+    # مسار عرض النماذج AI (الإضافة الجديدة)
+    path(
+        "ai-models-list/", AiModelsList.as_view(), name="ai_models_list"
+    ),  # المسار الجديد
 ]
